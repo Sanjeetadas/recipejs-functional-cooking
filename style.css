@@ -137,3 +137,61 @@ main {
     flex-wrap: wrap;
     justify-content: center;
 }
+
+.steps-container,
+.ingredients-container {
+  display: none;
+  margin-top: 10px;
+}
+
+.steps-container.visible,
+.ingredients-container.visible {
+  display: block;
+}
+
+.steps-level-1 {
+  margin-left: 20px;
+}
+
+.steps-level-2 {
+  margin-left: 40px;
+}
+
+.toggle-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 25px; /* curved pill shape */
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 6px 6px 0 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
+/* Hover effect */
+.toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+  background: linear-gradient(135deg, #764ba2, #667eea);
+}
+
+/* Active (when clicked) */
+.toggle-btn:active {
+  transform: scale(0.95);
+}
+
+/* When section is visible (optional highlight) */
+.toggle-btn.active {
+  background: linear-gradient(135deg, #28a745, #218838);
+}
+
+.steps-container,
+.ingredients-container {
+  background-color: #f0f2ff;
+  padding: 10px 15px;
+  border-radius: 12px;
+  margin-top: 10px;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+}

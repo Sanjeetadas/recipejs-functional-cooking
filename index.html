@@ -11,6 +11,15 @@
     <header>
         <h1>🍳 RecipeJS</h1>
         <p>Your Functional Cooking Companion</p>
+        <div class="search-container">
+            <input 
+                type="text" 
+                id="search-input" 
+                placeholder="Search recipes or ingredients..."
+            />
+            <button id="clear-search" class="hidden">✖</button>
+        </div>
+
     </header>
 
     <main>
@@ -21,6 +30,7 @@
                 <button data-filter="medium">Medium</button>
                 <button data-filter="hard">Hard</button>
                 <button data-filter="quick">Quick Recipes</button>
+                <button data-filter="favorites">❤️ Favorites</button>
             </div>
 
             <div class="sort-buttons">
@@ -30,6 +40,10 @@
             </div>
         </div>
 
+        <div id="recipe-counter">
+            Showing 0 of 0 recipes
+        </div>
+        
         <div id="recipe-container">
             <!-- Recipe cards will be rendered here by JavaScript -->
         </div>

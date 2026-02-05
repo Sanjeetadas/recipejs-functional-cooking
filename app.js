@@ -160,6 +160,12 @@ const recipes = [
 
 let currentFilter = "all";
 let currentSort = "none";
+let searchQuery = "";
+let favorites = JSON.parse(localStorage.getItem("recipeFavorites")) || [];
+const searchInput = document.querySelector("#search-input");
+const clearSearchBtn = document.querySelector("#clear-search");
+const recipeCounter = document.querySelector("#recipe-counter");
+
 
 // DOM selection
 const recipeContainer = document.querySelector('#recipe-container');
@@ -195,6 +201,12 @@ const createStepsHTML = (steps) => {
 const createRecipeCard = (recipe) => {
   return `
     <div class="recipe-card" data-recipe-id="${recipe.id}">
+      <button 
+        class="favorite-btn ${favorites.includes(recipe.id) ? "active" : ""}" 
+        data-recipe-id="${recipe.id}"
+      >
+        ❤️
+      </button>
       <h3>${recipe.title}</h3>
 
       <button class="toggle-btn" data-toggle="steps">Show Steps</button>
@@ -221,6 +233,26 @@ const filterByTime = (recipes, maxTime) => {
     return recipes.filter(recipe => recipe.time < maxTime);
 };
 
+const filterByFavorites = (recipes) => {
+  return recipes.filter(recipe => favorites.includes(recipe.id));
+};
+
+const filterBySearch = (recipes, query) => {
+  if (!query) return recipes;
+
+  const lowerQuery = query.toLowerCase().trim();
+
+  return recipes.filter(recipe => {
+    const titleMatch = recipe.title.toLowerCase().includes(lowerQuery);
+
+    const ingredientMatch = recipe.ingredients.some(ingredient =>
+      ingredient.toLowerCase().includes(lowerQuery)
+    );
+
+    return titleMatch || ingredientMatch;
+  });
+};
+
 const applyFilter = (recipes, filterType) => {
     switch (filterType) {
         case "easy":
@@ -231,8 +263,10 @@ const applyFilter = (recipes, filterType) => {
             return filterByDifficulty(recipes, "hard");
         case "quick":
             return filterByTime(recipes, 20);
+        case "favorites":
+          return filterByFavorites(recipes);
         default:
-            return recipes;
+          return recipes;
     }
 };
 
@@ -258,9 +292,11 @@ const applySort = (recipes, sortType) => {
 const updateDisplay = () => {
     let recipesToDisplay = recipes;
 
+    recipesToDisplay = filterBySearch(recipesToDisplay, searchQuery);
     recipesToDisplay = applyFilter(recipesToDisplay, currentFilter);
     recipesToDisplay = applySort(recipesToDisplay, currentSort);
 
+    updateRecipeCounter(recipesToDisplay.length, recipes.length);
     renderRecipes(recipesToDisplay);
     updateActiveButtons();
 };
@@ -281,6 +317,23 @@ const updateActiveButtons = () => {
     });
 };
 
+const updateRecipeCounter = (visible, total) => {
+  recipeCounter.textContent = `Showing ${visible} of ${total} recipes`;
+};
+
+const toggleFavorite = (recipeId) => {
+  const id = Number(recipeId);
+
+  if (favorites.includes(id)) {
+    favorites = favorites.filter(fav => fav !== id);
+  } else {
+    favorites.push(id);
+  }
+
+  localStorage.setItem("recipeFavorites", JSON.stringify(favorites));
+  updateDisplay();
+};
+
 const handleFilterClick = (event) => {
     currentFilter = event.target.dataset.filter;
     updateDisplay();
@@ -292,6 +345,10 @@ const handleSortClick = (event) => {
 };
 
 const handleToggleClick = (e) => {
+  if (e.target.classList.contains("favorite-btn")) {
+    toggleFavorite(e.target.dataset.recipeId);
+    return;
+  }
   if (!e.target.classList.contains("toggle-btn")) return;
 
   const button = e.target;
@@ -311,6 +368,26 @@ const handleToggleClick = (e) => {
   }
 };
 
+let debounceTimer;
+
+const handleSearchInput = (e) => {
+  clearTimeout(debounceTimer);
+
+  debounceTimer = setTimeout(() => {
+    searchQuery = e.target.value;
+    clearSearchBtn.classList.toggle("hidden", !searchQuery);
+    updateDisplay();
+  }, 300);
+};
+
+const clearSearch = () => {
+  searchInput.value = "";
+  searchQuery = "";
+  clearSearchBtn.classList.add("hidden");
+  updateDisplay();
+};
+
+
 const init = () => {
   setupEventListeners();
   updateDisplay();
@@ -327,6 +404,9 @@ const setupEventListeners = () => {
 
     recipeContainer.addEventListener("click", handleToggleClick);
     console.log("Event listeners attached!");
+
+    searchInput.addEventListener("input", handleSearchInput);
+    clearSearchBtn.addEventListener("click", clearSearch);
 
 };
 
